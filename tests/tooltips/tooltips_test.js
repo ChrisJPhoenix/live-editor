@@ -1,3 +1,30 @@
+describe("tooltips_test - test ACE anti-undo hack", function() {
+    it("ACE anti-undo hack still works", function() {
+        TTE.editor.setValue("");
+        TTE.editor.onTextInput("a(12");
+        expect(TTE.currentTooltip).to.be.equal(TTE.tooltips.numberScrubber);
+        TTE.currentTooltip.updateText("14");
+        // Should be a(14
+        expect(getLine()).to.be.equal("a(14");
+        TTE.currentTooltip.updateText("24");
+        // should be a(24
+        expect(getLine()).to.be.equal("a(24");
+        TTE.editor.undo();
+        expect(getLine()).to.be.equal("a(24"); // Huh? It didn't undo!
+        TTE.editor.session.$fromUndo = true;
+        TTE.currentTooltip.updateText("34");
+        TTE.currentTooltip.updateText("44");
+        expect(getLine()).to.be.equal("a(44"); // modifying text still works
+        TTE.editor.session.$fromUndo = false;
+        TTE.currentTooltip.updateText("54");
+        expect(getLine()).to.be.equal("a(54"); // modifying text still works
+        TTE.editor.undo();
+        expect(getLine()).to.be.equal("a(54"); // Huh? It didn't undo!
+        TTE.editor.undo();
+        expect(getLine()).to.be.equal("a(54"); // Huh? It didn't undo!
+    });
+});
+
 describe("General Tooltip Tests", function(){
     it("autoSuggest - detection", function() {
         typeLine("rect(44");
@@ -23,31 +50,4 @@ describe("General Tooltip Tests", function(){
         expect($('.tooltip').length).to.be.equal(0);
     });
 
-    it("ACE anti-undo hack still works", function() {
-        TTE.editor.setValue("");
-        //TTE.editor.session.getUndoManager().reset(); // This seems to disable the undo manager - why?
-        typeLine("a(5);");
-        var cursor = editor.getCursorPosition();
-        var Range = ace.require("ace/range").Range;
-        var range = new Range(cursor.row, cursor.column-3, cursor.row, cursor.column-2);
-        editor.session.replace(range, "6");
-        expect(getLine()).to.be.equal("a(6);");
-        editor.session.replace(range, "7");
-        expect(getLine()).to.be.equal("a(7);");
-        editor.undo();
-        // This next test will fail because undo() clears the buffer, undoing all changes.
-        // I need a way to keep ACE from merging the deltas.
-        expect(getLine()).to.be.equal("a(6);");
-        editor.session.$fromUndo = true;
-        editor.session.replace(range, "7");
-        editor.session.replace(range, "8");
-        expect(getLine()).to.be.equal("a(8);"); // modifying text still works
-        editor.session.$fromUndo = false;
-        editor.session.replace(range, "9");
-        expect(getLine()).to.be.equal("a(9);"); // modifying text still works
-        editor.undo();
-        expect(getLine()).to.be.equal("a(8);"); // undo works
-        editor.undo();
-        expect(getLine()).to.be.equal("a(5);"); // skip the 7 and 8
-    });
 });

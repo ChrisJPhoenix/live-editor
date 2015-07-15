@@ -68,6 +68,13 @@ TooltipEngine.classes.numberScrubber = TooltipBase.extend({
         var $scrubberHandle = $("<div class='scrubber-handle'/>")
             .append($leftButton).append($center).append($rightButton);
 
+        var textAtAceLocation = function() {
+            var Range = ace.require("ace/range").Range;
+            var loc = self.aceLocation;
+            var range = new Range(loc.row, loc.start, loc.row, loc.start + loc.length);
+            return self.parent.editor.getSession().getTextRange(range);
+        }
+
         if (!clickOnly) {
             $scrubberHandle.draggable({
                 axis: "x",
@@ -83,10 +90,7 @@ TooltipEngine.classes.numberScrubber = TooltipBase.extend({
                     // of the anti-undo changes.
                     // I could probably just remember the length, but I like putting back the
                     // original string. (It might even matter for i18n.)
-                    var Range = ace.require("ace/range").Range;
-                    var loc = self.aceLocation;
-                    var range = new Range(loc.row, loc.start, loc.row, loc.start + loc.length);
-                    self.originalString = parent.editor.getTextRange(range);
+                    self.originalString = textAtAceLocation();
                 },
                 drag: function(evt, ui) {
                     var thisOffset = ui.helper.offset();
