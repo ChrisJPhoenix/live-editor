@@ -7,6 +7,25 @@ var mockObject = function(obj, mocks) {
 
 window.tooltipClasses = TooltipEngine.classes;
 
+var newEditor = function(el) {
+    return new AceEditor({ //Initializes TooltipEngine internally
+        el: el,
+        autoFocus: true,
+        config: new ScratchpadConfig({
+            version: 3
+        }),
+        imagesDir: "../../build/images/",
+        externalsDir: "",
+        workersDir: "",
+        record: new ScratchpadRecord(),
+        type: "ace_pjs"
+    });
+};
+
+// This should be called instead of 29-40. I left those in unchanged to prove that I hadn't
+// introduced a bug with my newEditor() function.
+//window.ACE = newEditor("#faux_editor");
+
 window.ACE = new AceEditor({ //Initializes TooltipEngine internally
     el: "#faux_editor",
     autoFocus: true,
@@ -20,8 +39,17 @@ window.ACE = new AceEditor({ //Initializes TooltipEngine internally
     type: "ace_pjs"
 });
 
+
 window.editor = ACE.editor;
 window.TTE = ACE.tooltipEngine;
+
+var uniqueEditor = function() {
+    var id = "id_" + Math.floor(Math.random() * 100000000).toString(10);
+    console.log("id is " + id); // TODO - remove this line
+    $('body').append('<div id="' + id + '"></div>');
+    var ace = newEditor('#' + id);
+    return {editor: ace.editor, tte: ace.tooltipEngine};
+};
 
 ScratchpadAutosuggest.init(editor);
 editor.focus();

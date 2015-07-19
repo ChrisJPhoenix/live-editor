@@ -91,6 +91,8 @@ TooltipEngine.classes.numberScrubber = TooltipBase.extend({
                     // I could probably just remember the length, but I like putting back the
                     // original string. (It might even matter for i18n.)
                     self.originalString = textAtAceLocation();
+                    self.wasReadOnly = self.parent.editor.getReadOnly();
+                    self.parent.editor.setReadOnly(true);
                 },
                 drag: function(evt, ui) {
                     var thisOffset = ui.helper.offset();
@@ -121,6 +123,7 @@ TooltipEngine.classes.numberScrubber = TooltipBase.extend({
                     // are called after stop
                     setTimeout(function () {
                         self.dragged = false;
+                        self.parent.editor.setReadOnly(self.wasReadOnly);
                     }, 0);
                 }
             });

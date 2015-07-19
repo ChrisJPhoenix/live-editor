@@ -1,26 +1,28 @@
 describe("tooltips_test - test ACE anti-undo hack", function() {
     it("ACE anti-undo hack still works", function() {
-        TTE.editor.setValue("");
-        TTE.editor.onTextInput("a(12");
-        expect(TTE.currentTooltip).to.be.equal(TTE.tooltips.numberScrubber);
-        TTE.currentTooltip.updateText("14");
+        var editor = uniqueEditor();
+        return;
+        editor.editor.setValue("");
+        editor.editor.onTextInput("a(12");
+        expect(editor.currentTooltip).to.be.equal(editor.tte.tooltips.numberScrubber);
+        editor.currentTooltip.updateText("14");
         // Should be a(14
         expect(getLine()).to.be.equal("a(14");
-        TTE.currentTooltip.updateText("24");
+        editor.currentTooltip.updateText("24");
         // should be a(24
         expect(getLine()).to.be.equal("a(24");
-        TTE.editor.undo();
+        editor.editor.undo();
         expect(getLine()).to.be.equal("a(24"); // Huh? It didn't undo!
-        TTE.editor.session.$fromUndo = true;
-        TTE.currentTooltip.updateText("34");
-        TTE.currentTooltip.updateText("44");
-        expect(getLine()).to.be.equal("a(44"); // modifying text still works
-        TTE.editor.session.$fromUndo = false;
-        TTE.currentTooltip.updateText("54");
+        editor.editor.session.$fromUndo = true;
+        editor.currentTooltip.updateText("34");
+        editor.currentTooltip.updateText("44");
+        editor(getLine()).to.be.equal("a(44"); // modifying text still works
+        editor.editor.session.$fromUndo = false;
+        editor.currentTooltip.updateText("54");
         expect(getLine()).to.be.equal("a(54"); // modifying text still works
-        TTE.editor.undo();
+        editor.editor.undo();
         expect(getLine()).to.be.equal("a(54"); // Huh? It didn't undo!
-        TTE.editor.undo();
+        editor.editor.undo();
         expect(getLine()).to.be.equal("a(54"); // Huh? It didn't undo!
     });
 });
