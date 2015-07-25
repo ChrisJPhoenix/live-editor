@@ -73,7 +73,7 @@ TooltipEngine.classes.numberScrubber = TooltipBase.extend({
             var loc = self.aceLocation;
             var range = new Range(loc.row, loc.start, loc.row, loc.start + loc.length);
             return self.parent.editor.getSession().getTextRange(range);
-        }
+        };
 
         if (!clickOnly) {
             $scrubberHandle.draggable({

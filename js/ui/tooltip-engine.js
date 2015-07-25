@@ -238,12 +238,12 @@ window.TooltipBase = Backbone.View.extend({
     // number-scrubbing.
     // THIS IS A PROBLEMATIC HACK.
     //  - If the undo chain and the editor's text are left in an inconsistent state, then
-    //     future undo's will change the wrong text. I think this just means you need to
+    //     future undo's will change the wrong text. I (ChrisJPhoenix) think this just means you need to
     //     put the editor's text back the way it was before letting anything else happen.
     //     This causes problems if the user hits the keyboard in the middle of a number-scrub: undo
-    //     won't put things back correctly. I don't know if this is acceptable.
+    //     won't put things back correctly. Thus, use editor.setReadOnly(true) while using this hack.
     //  - I use the session's $fromUndo variable to tell the editor not to save undo's. This
-    //     is undocumented. I added a test for it, but it doesn't work right yet - see comments there.
+    //     is undocumented. There's currently (7/25/15) a test for it in tooltips_test.js.
     updateText: function(newText, customSelection, avoidUndo) {
         if (!this.parent || this.parent.options.record.playing) {
             return;

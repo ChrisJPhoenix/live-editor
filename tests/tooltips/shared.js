@@ -7,9 +7,11 @@ var mockObject = function(obj, mocks) {
 
 window.tooltipClasses = TooltipEngine.classes;
 
-var newEditor = function(el) {
-    return new AceEditor({ //Initializes TooltipEngine internally
-        el: el,
+var uniqueEditor = function() {
+    var elem = document.createElement('div');
+    document.body.appendChild(elem);
+    var ace = new AceEditor({ //Initializes TooltipEngine internally
+        el: elem,
         autoFocus: true,
         config: new ScratchpadConfig({
             version: 3
@@ -20,49 +22,24 @@ var newEditor = function(el) {
         record: new ScratchpadRecord(),
         type: "ace_pjs"
     });
+    ScratchpadAutosuggest.init(ace.editor);
+    ace.editor.focus();
+    ace.setSelection({
+        start: {
+            row: 0,
+            column: 0
+        },
+        end: {
+            row: 0,
+            column: 0
+        }
+    });
+    return ace;
 };
 
-// This should be called instead of 29-40. I left those in unchanged to prove that I hadn't
-// introduced a bug with my newEditor() function.
-//window.ACE = newEditor("#faux_editor");
-
-window.ACE = new AceEditor({ //Initializes TooltipEngine internally
-    el: "#faux_editor",
-    autoFocus: true,
-    config: new ScratchpadConfig({
-        version: 3
-    }),
-    imagesDir: "../../build/images/",
-    externalsDir: "",
-    workersDir: "",
-    record: new ScratchpadRecord(),
-    type: "ace_pjs"
-});
-
-
+window.ACE = uniqueEditor();
 window.editor = ACE.editor;
 window.TTE = ACE.tooltipEngine;
-
-var uniqueEditor = function() {
-    var id = "id_" + Math.floor(Math.random() * 100000000).toString(10);
-    console.log("id is " + id); // TODO - remove this line
-    $('body').append('<div id="' + id + '"></div>');
-    var ace = newEditor('#' + id);
-    return {editor: ace.editor, tte: ace.tooltipEngine};
-};
-
-ScratchpadAutosuggest.init(editor);
-editor.focus();
-ACE.setSelection({
-    start: {
-        row: 0,
-        column: 0
-    },
-    end: {
-        row: 0,
-        column: 0
-    }
-});
 
 for (var TooltipName in TooltipEngine.prototype.classes) {
     var Tooltip = TooltipEngine.classes[TooltipName];
